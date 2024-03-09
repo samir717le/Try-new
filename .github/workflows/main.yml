@@ -1,0 +1,51 @@
+name: Deploy Site
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 0 * * *"  # Runs every day at midnight UTC
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      # Set up PHP
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'  # Choose the PHP version you need
+          extensions: mbstring, pdo_mysql  # Add any additional PHP extensions you need
+        
+      # Set up MySQL (replace with your database setup steps)
+      - name: Set up MySQL
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+      - name: Install MySQL client
+        run: sudo apt-get install mysql-client
+      
+      # Deploy your site (replace with your deployment steps)
+      - name: Deploy site
+        run: |
+          # Example deployment commands
+          php artisan migrate  # Run database migrations
+          php artisan config:cache  # Cache configuration
+          php artisan route:cache  # Cache routes
+          php artisan optimize  # Optimize application
+          # Add your deployment commands here
+        
+      # Cleanup or any other post-deployment steps
+      - name: Cleanup
+        run: |
+          # Example cleanup commands
+          php artisan cache:clear  # Clear application cache
+          php artisan view:clear  # Clear compiled views
+          # Add any other cleanup commands here
